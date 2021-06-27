@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 const addressToCoords = require("../util/location");
 
@@ -64,7 +65,7 @@ const createPlace = async (req, res, next) => {
   });
   let user;
   try {
-    user = await new UserModel.findById({ creator });
+    user = await UserModel.findById(creator);
   } catch {
     const error = new HttpError("Something went wrong", 500);
     return next(error);
@@ -74,7 +75,12 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
   try {
-    await createdPlace.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPlace.save({ session: sess });
+    user.places.push(createdPlace);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError("Creating place failed", 500);
     return next(error);
@@ -119,7 +125,7 @@ const deletePlaceByPlaceId = async (req, res, next) => {
   const placeId = req.params.placeId;
   let place;
   try {
-    place = await PlaceModel.findById(placeId);
+    place = await PlaceModel.findById(placeId).populate("creator");
   } catch {
     const error = new HttpError("Something went wrong", 500);
     return next(error);
@@ -129,7 +135,12 @@ const deletePlaceByPlaceId = async (req, res, next) => {
     return next(error);
   }
   try {
-    await place.remove();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await place.remove({ session: sess });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: sess });
+    await sess.commitTransaction();
   } catch {
     const error = new HttpError("Something went wrong", 500);
     return next(error);
