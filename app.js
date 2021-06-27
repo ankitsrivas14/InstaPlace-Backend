@@ -1,9 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const HttpError = require("./models/http-error");
 const placesRoutes = require("./routes/places-routes");
 const userRoutes = require("./routes/users-routes");
+
+const MongoDbConnectUrl =
+  "mongodb+srv://ankitsrivas14:rRGWeCszwScSi4Kq@cluster0.lyltn.mongodb.net/InstaPlaces?retryWrites=true&w=majority";
 
 const app = express();
 
@@ -28,4 +32,11 @@ app.use((error, req, res, next) => {
     .json({ message: error.message || "Something went wrong!" });
 });
 
-app.listen(5000);
+mongoose
+  .connect(MongoDbConnectUrl)
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
