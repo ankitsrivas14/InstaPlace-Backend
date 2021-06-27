@@ -88,7 +88,7 @@ const deletePlaceByPlaceId = (req, res, next) => {
 };
 
 exports.getPlacesByPlaceId = getPlacesByPlaceId;
-exports.getPlaceByUserId = getPlacesByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlaceByPlaceId = updatePlaceByPlaceId;
 exports.deletePlaceByPlaceId = deletePlaceByPlaceId;

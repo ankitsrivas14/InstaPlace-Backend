@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
-// app.use("/api/user", userRoutes);
+app.use("/api/user", userRoutes);
 
 //Error handling for any unwanted route
 //This middleware will be triggered when there is no 'next' sent insude any route
